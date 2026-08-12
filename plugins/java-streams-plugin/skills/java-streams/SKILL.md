@@ -7,6 +7,16 @@ description: Comprehensive knowledge for writing, reviewing, debugging, and mode
 
 Java's `Stream` API rewards precision more than most of the language: small choices (which `Collectors` overload, `map` vs `mapMulti`, `reduce` vs `collect`) are the difference between code that's correct-but-slow, subtly-wrong-under-parallel, or throws in production on data your test fixtures never exercised. This skill exists to get those choices right on the first pass instead of after a bug report.
 
+## Scope: this is guidance, not a mandate to rewrite working code
+
+This skill governs how to write, review, and reason about Stream code — it is not a standing instruction to convert loops into streams wherever one is found.
+
+- **Existing code that already works (a `for`/`while` loop, an `Iterator`, an index-based loop):** don't rewrite it to a stream as a drive-by change, including as an unrequested side effect of an unrelated task in the same file. If a stream genuinely would be better — clearer, better performing, or fixes a latent bug, is what the user is actually asking for — say so and propose it explicitly, or ask first. Never fold a loop-to-stream conversion silently into a diff whose purpose is something else; that's the kind of scope creep that makes a changeset harder to review and can quietly change behavior the user didn't ask to change (iteration order, exception timing, short-circuit semantics, and mutable-state side effects inside the loop body don't always translate 1:1 into a stream pipeline — see `advanced-scenarios.md` for cases where that translation is genuinely lossy, not just stylistic).
+- **New code — a method, class, or block that doesn't exist yet:** default to a stream pipeline over an equivalent hand-rolled loop when it's genuinely more readable for the task. This is the normal case the rest of this skill's guidance is written for.
+- **When reviewing existing stream code for bugs** (see the section below), fix or flag what's actually broken — don't use a review as an opening to also modernize unrelated, correct loops nearby.
+
+The underlying reason: streams and loops are both legitimate tools, and this skill's job is to make stream code correct when a stream is the right call, not to campaign for streams over loops in code nobody asked to touch.
+
 ## How to use this skill
 
 Four reference files hold the depth; read the one(s) relevant to the task at hand rather than loading all of them up front:
