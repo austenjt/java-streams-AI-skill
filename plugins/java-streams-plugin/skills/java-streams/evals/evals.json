@@ -1,0 +1,40 @@
+{
+  "skill_name": "java-streams",
+  "evals": [
+    {
+      "id": 0,
+      "name": "group-sum-top5",
+      "prompt": "I have a List<Order> in a Java 21 codebase, where Order is a record with fields customerId, customerName, and amount (an int, in cents). I need to group the orders by customer, compute each customer's total spend, and get the top 5 customers by total spend — descending, with ties broken alphabetically by customer name so the output is deterministic. Can you write this for me?",
+      "expected_output": "Java code using Collectors.groupingBy with a numeric downstream collector (summingInt, not boxed reduce) to build a Map<String, Integer> of totals, then sorts the entry set by value descending with an explicit tie-break comparator (e.g. thenComparing on the key), then limits to 5.",
+      "files": []
+    },
+    {
+      "id": 1,
+      "name": "parallel-race-review",
+      "prompt": "This method sometimes returns fewer names than I expect, and once it threw an ArrayIndexOutOfBoundsException — it's inconsistent between runs on the same input. Can you figure out why and fix it?\n\n```java\npublic List<String> processNames(List<Person> people) {\n    List<String> results = new ArrayList<>();\n    people.parallelStream().forEach(p -> {\n        if (p.isActive()) {\n            results.add(p.getName().toUpperCase());\n        }\n    });\n    return results;\n}\n```",
+      "expected_output": "Correctly diagnoses the root cause as a data race: multiple threads from parallelStream().forEach() concurrently mutating a non-thread-safe ArrayList. Fixes it by restructuring to filter().map().collect(Collectors.toList()) (letting collect own thread-safe accumulation) rather than only wrapping the list in Collections.synchronizedList as the primary fix.",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "modernize-teeing",
+      "prompt": "Can you modernize this Java 8-style code to use modern Java streams (this is a Java 21 project), computing both the average and the count in a single pass over the orders list?\n\n```java\npublic double[] computeStats(List<Order> orders) {\n    double sum = 0;\n    int count = 0;\n    for (Order o : orders) {\n        sum += o.getAmount();\n        count++;\n    }\n    double avg = count == 0 ? 0 : sum / count;\n    return new double[]{avg, count};\n}\n```",
+      "expected_output": "Uses Collectors.teeing to combine Collectors.counting() and Collectors.averagingInt/Double(Order::getAmount) into one result in a single pass, merged via a small record or similar typed result instead of a double[]. Does not iterate the list twice.",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "sequenced-collections-record-patterns",
+      "prompt": "This is a Java 21 codebase. I have a `List<Event> history` (most-recent-last) where `Event` is a sealed interface implemented by records `Click(String userId, String elementId)`, `Purchase(String userId, String sku, double amount)`, and `PageView(String userId, String url)`. I need a method that: (1) walks the events in reverse chronological order (most recent first) without mutating the original list, and (2) for each event produces a one-line description string appropriate to its type (e.g. a Purchase shows the sku and amount, a Click shows the element id, a PageView shows the url). Can you write this idiomatically for Java 21?",
+      "expected_output": "Uses List's Java 21 Sequenced Collections reversed() method (history.reversed().stream()) rather than Collections.reverse() (which mutates) or a manual index-based loop, and uses a switch expression with record patterns to deconstruct each sealed Event subtype exhaustively (no default branch needed since Event is sealed) rather than an instanceof/cast chain.",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "virtual-threads-parallel-misconception",
+      "prompt": "We're on Java 21. I have `List<String> urls` (about 50,000 of them) and I want to call a blocking HTTP client for each one and collect the responses: `urls.parallelStream().map(this::fetchBlocking).toList()`. Since Java 21 has virtual threads now, will this pipeline automatically pick them up and scale well to 50,000 concurrent blocking calls? If not, what should I actually do instead?",
+      "expected_output": "Correctly explains that .parallelStream() does NOT use virtual threads in any current JDK version — it still dispatches to the platform-thread-backed ForkJoinPool.commonPool(), sized around availableProcessors(), so 50,000 blocking calls will badly oversaturate a pool meant for CPU-bound work and will also starve unrelated parallel streams elsewhere in the JVM sharing that same common pool. Recommends an actual I/O-bound-concurrency tool instead — a virtual-thread-per-task ExecutorService (Executors.newVirtualThreadPerTaskExecutor()) or structured concurrency (StructuredTaskScope) — not .parallelStream().",
+      "files": []
+    }
+  ]
+}

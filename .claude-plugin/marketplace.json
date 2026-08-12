@@ -1,0 +1,24 @@
+{
+  "name": "java-streams-ai-skill",
+  "owner": {
+    "name": "Jon Austen"
+  },
+  "metadata": {
+    "description": "A marketplace hosting the java-streams plugin: a comprehensive Java Stream API skill covering Collectors composition, parallel-stream pitfalls, and Java 17/21/25 LTS updates.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "java-streams",
+      "source": "./plugins/java-streams-plugin",
+      "description": "Guidance for writing, reviewing, debugging, and modernizing Java Stream API code — Collectors composition, parallel-stream pitfalls, and Java 17/21/25 LTS updates.",
+      "version": "1.0.0",
+      "author": {
+        "name": "Jon Austen"
+      },
+      "license": "GPL-3.0",
+      "category": "programming-languages",
+      "keywords": ["java", "streams", "collectors", "parallel-streams", "java21", "java25", "lts"]
+    }
+  ]
+}

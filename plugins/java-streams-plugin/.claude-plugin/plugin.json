@@ -1,0 +1,13 @@
+{
+  "name": "java-streams",
+  "description": "Comprehensive guidance for writing, reviewing, debugging, and modernizing Java Stream API code — Collectors composition, parallel-stream pitfalls, and Java 17/21/25 LTS updates.",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jon Austen"
+  },
+  "homepage": "https://github.com/austenjt/java-streams-AI-skill",
+  "repository": "https://github.com/austenjt/java-streams-AI-skill",
+  "license": "GPL-3.0",
+  "keywords": ["java", "streams", "collectors", "parallel-streams", "java21", "java25", "lts"],
+  "category": "programming-languages"
+}
