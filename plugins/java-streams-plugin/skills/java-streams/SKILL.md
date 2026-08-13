@@ -17,15 +17,20 @@ This skill governs how to write, review, and reason about Stream code — it is 
 
 The underlying reason: streams and loops are both legitimate tools, and this skill's job is to make stream code correct when a stream is the right call, not to campaign for streams over loops in code nobody asked to touch.
 
+### Recognizing candidates in code you're reading
+
+Part of this skill's job is pattern-recognition: nested loops and chained `if` statements often have the exact shape of a stream pipeline (a nested loop building one flat list *is* `flatMap`; a boolean flag flipped and `break`-ed out of a loop *is* `anyMatch`). `references/refactoring-patterns.md` catalogs these shapes. Recognizing one in code you're reading is useful on its own — it's how you notice and *say so*. It is not, by itself, permission to act: the same rule above applies — flag it and propose the change (or ask) for existing code, apply it directly only when you're writing the code fresh. Not every loop is a candidate either; that reference file is equally explicit about the shapes that are better left as loops (adjacent-element access, multiple differently-meaningful early exits, `continue`-heavy control flow) — don't force a fit where the loop was already the honest representation of the logic.
+
 ## How to use this skill
 
-Four reference files hold the depth; read the one(s) relevant to the task at hand rather than loading all of them up front:
+Five reference files hold the depth; read the one(s) relevant to the task at hand rather than loading all of them up front:
 
 - **[references/core-api.md](references/core-api.md)** — stream creation, every intermediate/terminal operation, the laziness/fusion mental model, primitive streams, the one-shot rule. Start here for "how does X operation actually behave."
 - **[references/collectors.md](references/collectors.md)** — the full `Collectors` toolkit: `toMap`'s duplicate-key trap, `groupingBy`/`partitioningBy` and composing them with downstream collectors, `teeing`, `collectingAndThen`, writing a custom `Collector.of(...)`, `mapMulti` vs `flatMap`. Read this before writing any grouping/aggregation code.
 - **[references/lts-updates.md](references/lts-updates.md)** — what shipped in each JDK version from 9 through 25 LTS, organized so you can answer "is this available on the version this project targets." Read this when modernizing old code or when the user asks what's new.
 - **[references/advanced-scenarios.md](references/advanced-scenarios.md)** — 15 worked hard-mode scenarios (stateful-lambda races, `peek` abuse, infinite-stream hangs, checked exceptions in lambdas, custom `Spliterator`, `reduce`'s combiner trap, record-pattern deconstruction, and more), each with a broken version, why it's broken, and the fix. Read this when the task is non-routine or when reviewing someone else's stream code for correctness.
 - **[references/parallel-and-performance.md](references/parallel-and-performance.md)** — when `.parallel()` actually helps, why it shares one JVM-wide thread pool, why virtual threads don't power it, and what source types parallelize well. Read this before recommending or reviewing `.parallelStream()`.
+- **[references/refactoring-patterns.md](references/refactoring-patterns.md)** — the nested-loop/nested-if → stream pattern catalog described above: `flatMap` for nested loops, short-circuiting terminal ops for flag-and-break loops, `partitioningBy`/`groupingBy` for multi-bucket loops, `Optional` chaining for null-check pyramids, and an explicit list of loop shapes that *don't* simplify well. Read this when scanning existing code for refactor candidates, or when asked something like "can streams replace this?"
 
 If the task is a quick, unambiguous one-liner (e.g. "group this list by field X"), you often don't need to open a reference file at all — the patterns below cover the common cases directly.
 

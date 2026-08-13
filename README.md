@@ -36,7 +36,7 @@ plugins/java-streams-plugin/
   .claude-plugin/plugin.json             # plugin manifest
   skills/java-streams/
     SKILL.md                             # canonical skill entry point
-    references/                          # core-api, collectors, lts-updates, advanced-scenarios, parallel-and-performance
+    references/                          # core-api, collectors, lts-updates, advanced-scenarios, parallel-and-performance, refactoring-patterns
     evals/evals.json                     # eval prompts used to test this skill
 .claude/skills/java-streams/             # symlink to plugins/java-streams-plugin/skills/java-streams,
                                           # so this repo works as a project-level skill with no install step
